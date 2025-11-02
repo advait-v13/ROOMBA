@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="tri_roomba_navigation" type="simple_waypoint_publisher.py" name="waypoint_pub" output="screen"/>
+</launch>

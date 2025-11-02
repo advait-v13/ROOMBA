@@ -1,0 +1,137 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="tri_roomba">
+
+  <!-- Parameters -->
+  <xacro:property name="wheel_radius" value="0.05"/>
+  <xacro:property name="wheel_width" value="0.02"/>
+  <xacro:property name="wheel_base" value="0.17"/> <!-- distance from center to wheel -->
+  <xacro:property name="base_mass" value="5.0"/>
+
+  <!-- Base -->
+  <link name="base_link">
+    <inertial>
+      <mass value="${base_mass}"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.15" ixy="0.0" ixz="0.0" iyy="0.15" iyz="0.0" izz="0.15"/>
+    </inertial>
+    <visual>
+      <geometry>
+        <cylinder radius="0.22" length="0.12"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.22" length="0.12"/>
+      </geometry>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </collision>
+  </link>
+
+  <!-- Wheels -->
+  <link name="wheel_front_link">
+    <inertial>
+      <mass value="0.3"/>
+      <origin xyz="0 0 0"/>
+      <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001"/>
+    </inertial>
+    <visual>
+      <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      <origin xyz="0 0 0" rpy="0 1.5708 0"/>
+    </visual>
+    <collision>
+      <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      <origin xyz="0 0 0" rpy="0 1.5708 0"/>
+    </collision>
+  </link>
+  <joint name="wheel_front_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_front_link"/>
+    <origin xyz="${wheel_base} 0 0" rpy="0 0 0"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <link name="wheel_left_link">
+    <visual>
+      <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      <origin xyz="0 0 0" rpy="0 1.5708 0"/>
+    </visual>
+  </link>
+  <joint name="wheel_left_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_left_link"/>
+    <origin xyz="-${wheel_base} 0 0" rpy="0 0 2.0944"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <link name="wheel_right_link">
+    <visual>
+      <geometry><cylinder radius="${wheel_radius}" length="${wheel_width}"/></geometry>
+      <origin xyz="0 0 0" rpy="0 1.5708 0"/>
+    </visual>
+  </link>
+  <joint name="wheel_right_joint" type="continuous">
+    <parent link="base_link"/>
+    <child link="wheel_right_link"/>
+    <origin xyz="0 -${wheel_base} 0" rpy="0 0 -2.0944"/>
+    <axis xyz="0 1 0"/>
+  </joint>
+
+  <transmission name="trans_wheel_front">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wheel_front_joint"/>
+    <actuator name="motor_wheel_front"><mechanicalReduction>1</mechanicalReduction></actuator>
+  </transmission>
+
+  <transmission name="trans_wheel_left">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wheel_left_joint"/>
+    <actuator name="motor_wheel_left"><mechanicalReduction>1</mechanicalReduction></actuator>
+  </transmission>
+
+  <transmission name="trans_wheel_right">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="wheel_right_joint"/>
+    <actuator name="motor_wheel_right"><mechanicalReduction>1</mechanicalReduction></actuator>
+  </transmission>
+
+  <link name="imu_link">
+    <inertial><mass value="0.05"/></inertial>
+    <visual><geometry><sphere radius="0.02"/></geometry></visual>
+  </link>
+  <joint name="imu_fixed" type="fixed"><parent link="base_link"/><child link="imu_link"/><origin xyz="0 0 0.08" rpy="0 0 0"/></joint>
+
+  <link name="lidar_link">
+    <visual><geometry><cylinder radius="0.02" length="0.02"/></geometry></visual>
+  </link>
+  <joint name="lidar_fixed" type="fixed"><parent link="base_link"/><child link="lidar_link"/><origin xyz="0 0 0.08" rpy="0 0 0"/></joint>
+
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+      <robotNamespace>/tri_roomba</robotNamespace>
+      <controlPeriod>0.001</controlPeriod>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="lidar_link">
+    <plugin name="gazebo_ros_laser" filename="libgazebo_ros_laser.so">
+      <topicName>/scan</topicName>
+      <frameName>lidar_link</frameName>
+      <updateRate>10.0</updateRate>
+      <rangeMax>6.0</rangeMax>
+      <samples>360</samples>
+      <resolution>1</resolution>
+      <minAngle>-3.14159</minAngle>
+      <maxAngle>3.14159</maxAngle>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="imu_link">
+    <plugin name="gazebo_ros_imu" filename="libgazebo_ros_imu.so">
+      <topicName>/imu/data</topicName>
+      <frameName>imu_link</frameName>
+      <updateRate>50.0</updateRate>
+    </plugin>
+  </gazebo>
+
+</robot>

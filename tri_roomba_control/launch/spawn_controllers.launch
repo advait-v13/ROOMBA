@@ -1,0 +1,7 @@
+<launch>
+  <rosparam file="$(find tri_roomba_control)/config/controllers.yaml" command="load"/>
+
+  <node name="spawner_js" pkg="controller_manager" type="spawner" args="joint_state_broadcaster" respawn="false" output="screen"/>
+
+  <node name="spawner_wheels" pkg="controller_manager" type="spawner" args="wheel_front_velocity_controller wheel_left_velocity_controller wheel_right_velocity_controller" respawn="false" output="screen"/>
+</launch>

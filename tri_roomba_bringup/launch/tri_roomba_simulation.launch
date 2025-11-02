@@ -1,0 +1,13 @@
+<launch>
+  <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+
+  <param name="robot_description" command="$(find xacro)/xacro $(find tri_roomba_description)/urdf/tri_roomba.xacro" />
+
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model tri_roomba" output="screen"/>
+
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen"/>
+
+  <include file="$(find tri_roomba_control)/launch/spawn_controllers.launch" />
+
+  <node pkg="tri_roomba_control" type="cmdvel_to_wheels.py" name="cmdvel_to_wheels" output="screen" respawn="false" />
+</launch>

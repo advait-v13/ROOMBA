@@ -1,0 +1,18 @@
+joint_state_broadcaster:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+
+wheel_front_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  joint: wheel_front_joint
+  pid: {p: 20.0, i: 0.0, d: 0.01, i_clamp: 0.0}
+
+wheel_left_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  joint: wheel_left_joint
+  pid: {p: 20.0, i: 0.0, d: 0.01, i_clamp: 0.0}
+
+wheel_right_velocity_controller:
+  type: velocity_controllers/JointVelocityController
+  joint: wheel_right_joint
+  pid: {p: 20.0, i: 0.0, d: 0.01, i_clamp: 0.0}
